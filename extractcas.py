@@ -19,9 +19,10 @@ parser.add_argument("input")
 parser.parse_args()
 args = parser.parse_args()
 
-
-
 def read_header(f):
+	'''
+	Reader tape header
+	'''
 	data = f.read(1)
 	while data != b'\x1f' and data != b'':
 		data = f.read(1)
@@ -33,6 +34,9 @@ def read_header(f):
 	return True
 
 def identify(f):
+	'''
+	Identify the type of block
+	'''
 	#print("Identify @ {}".format(hex(f.tell())))
 
 	if not read_header(f):
@@ -57,15 +61,24 @@ def identify(f):
 	
 
 def read_addr(f):
+	'''
+	Read a 16 bit address, encoded with MSX's little endian
+	'''
 	return int.from_bytes(f.read(2), "little")
 
 def read_filename(f):
+	'''
+	Read a file name
+	'''
 	filename = f.read(6)
 	filename = filename.decode('utf-8')
 	filename = filename.strip()
 	return filename
 
 def read_ASCII(f):
+	'''
+	Read an ASCII file
+	'''
 	filename = read_filename(f)
 	print("Found ASCII: {}".format(filename))
 	
@@ -92,6 +105,9 @@ def read_ASCII(f):
 	#print("READ ASCII END @ ", hex(f.tell()))
 	
 def read_binary(f):
+	'''
+	Read a binary file
+	'''
 	filename = f.read(6)
 	filename = filename.decode('utf-8')
 	filename = filename.strip()
@@ -113,6 +129,9 @@ def read_binary(f):
 		out.write(data)
 
 def read_block(f, filename):
+	'''
+	Read a custom data block
+	'''
 	print("Found {}".format(filename))
 
 	buffer = b''
@@ -136,12 +155,16 @@ def read_block(f, filename):
 	f.seek(f.tell() - 8)
 
 def read_basic(f):
+	'''
+	Read a tokenized BASIC program
+	'''
 	raise NotImplementedError()
 
 
 input_filename = args.input
-block_num = 1
+block_num = 1 # Counter for the custom block file names
 
+# Process all files
 with open(input_filename, 'rb') as f:
 	id = identify(f)
 	while id != 'EOF':
