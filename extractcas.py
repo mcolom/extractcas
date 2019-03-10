@@ -11,14 +11,6 @@ http://mcolom.info
 import argparse
 import sys
 
-description = "Extract files from an MSX's CAS file"
-epilog = '(C) Miguel Colom, GNU GPL3 license. http://mcolom.info'
-
-parser = argparse.ArgumentParser(description=description, epilog=epilog)
-parser.add_argument("input")
-parser.parse_args()
-args = parser.parse_args()
-
 def read_header(f):
 	'''
 	Reader tape header
@@ -161,7 +153,17 @@ def read_basic(f):
 	raise NotImplementedError()
 
 
-input_filename = args.input
+description = "Extract files from an MSX's CAS file"
+epilog = '(C) Miguel Colom, GNU GPL3 license. http://mcolom.info'
+
+parser = argparse.ArgumentParser(description=description, epilog=epilog)
+#parser.add_argument("input")
+parser.parse_args()
+args = parser.parse_args()
+
+
+#input_filename = args.input
+input_filename = "gi_ZIPIZA-A.CAS"
 block_num = 1 # Counter for the custom block file names
 
 # Process all files
