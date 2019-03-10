@@ -162,8 +162,7 @@ parser.parse_args()
 args = parser.parse_args()
 
 
-#input_filename = args.input
-input_filename = "gi_ZIPIZA-A.CAS"
+input_filename = args.input
 block_num = 1 # Counter for the custom block file names
 
 # Process all files
