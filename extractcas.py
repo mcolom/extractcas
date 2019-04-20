@@ -157,7 +157,7 @@ description = "Extract files from an MSX's CAS file"
 epilog = '(C) Miguel Colom, GNU GPL3 license. http://mcolom.info'
 
 parser = argparse.ArgumentParser(description=description, epilog=epilog)
-#parser.add_argument("input")
+parser.add_argument("input")
 parser.parse_args()
 args = parser.parse_args()
 
