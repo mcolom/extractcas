@@ -141,10 +141,14 @@ def read_block(f, filename):
 			header_detected = buffer[-7:] == header
 	
 	with open(filename, 'wb') as out:
-		out.write(buffer[:-8])
+		if header_detected:
+			out.write(buffer[:-8])
+		else:
+			out.write(buffer)
 	
 	# Undo header read
-	f.seek(f.tell() - 8)
+	if header_detected:
+		f.seek(f.tell() - 8)
 
 def read_basic(f):
 	'''
