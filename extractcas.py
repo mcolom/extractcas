@@ -54,9 +54,15 @@ def identify(f):
 
 def read_addr(f):
     '''
-    Read a 16 bit address, encoded with MSX's little endian
+    Read a 16-bit address, encoded with MSX's little endian
     '''
     return int.from_bytes(f.read(2), "little")
+
+def write_addr(addr, f):
+    '''
+    Write a 16-bit address, encoded with MSX's little endian
+    '''
+    f.write(addr.to_bytes(2, byteorder='little'))
 
 def read_filename(f):
     '''
@@ -110,14 +116,19 @@ def read_binary(f):
     start = read_addr(f)
     end = read_addr(f)
     execution = read_addr(f)
-
-    print("Found binary: {}. Start: {}, end: {}, exec: {}".\
-        format(filename, hex(start), hex(end), hex(execution)))
     
     length = end - start + 1
     data = f.read(length)
-    
+
+    print(f"Found binary: {filename}, {len(data)} bytes. Start: {hex(start)}, end: {hex(end)}, exec: {hex(execution)}")
+        
     with open(filename, 'wb') as out:
+        # Write start, end, and execution addresses
+        write_addr(start, out)
+        write_addr(end, out)
+        write_addr(execution, out)
+
+        # Write data
         out.write(data)
 
 def read_block(f, filename):
