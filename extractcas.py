@@ -150,13 +150,14 @@ def read_block(f, filename):
         else:
             buffer += v
             header_detected = buffer[-7:] == header
-    
-    if header_detected:
-        with open(filename, 'wb') as out:
+
+    with open(filename, 'wb') as out:
+        if header_detected:
             out.write(buffer[:-8])
-    
-    # Undo header read
-    f.seek(f.tell() - 8)
+            # Undo header read
+            f.seek(f.tell() - 8)
+        else:
+            out.write(buffer)
 
 def read_basic(f):
     '''
