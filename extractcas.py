@@ -124,7 +124,7 @@ def read_block(f, filename):
     '''
     Read a custom data block
     '''
-    print("Found {}".format(filename))
+    print("Found block {}".format(filename))
 
     buffer = b''
     header = bytes((0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74))
@@ -140,8 +140,9 @@ def read_block(f, filename):
             buffer += v
             header_detected = buffer[-7:] == header
     
-    with open(filename, 'wb') as out:
-        out.write(buffer[:-8])
+    if header_detected:
+        with open(filename, 'wb') as out:
+            out.write(buffer[:-8])
     
     # Undo header read
     f.seek(f.tell() - 8)
