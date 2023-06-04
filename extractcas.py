@@ -23,19 +23,21 @@ def read_header(f):
     
     data = f.read(7)
     assert data == bytes((0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74)), f'Bad header: {data}'
+    #print(f"read_header finished, f.tell() = {hex(f.tell())}\n\n")
     return True
 
 def identify(f):
     '''
     Identify the type of block
     '''
-    #print("Identify @ {}".format(hex(f.tell())))
-
+    #print(f"identify at offset {hex(f.tell())}")
     if not read_header(f):
         return "EOF"
 
+    pos = f.tell() # Save in case it's a custom block, to undo
+
     value = f.read(1)
-    print(f"identify A: {value}")
+    #print(f"identify: {value}")
     
     if value == b'':
         return "EOF"
@@ -45,8 +47,18 @@ def identify(f):
     if value in d:
         for i in range(9):
             dup = f.read(1)
-            if dup == b'' or value != dup:
+            if dup == b'':
                 return "EOF"
+
+            if value != dup:
+                # We don't have the ID byte repeated:
+                # it's most probably a custom block
+                #
+                # Get back to the beginning of the block and
+                # return "BLOCK"
+                f.seek(pos)
+                return "BLOCK"
+
         return d[value]
     
     # It's a data block. We have to undue the read of the
@@ -138,7 +150,7 @@ def read_block(f, filename):
     '''
     Read a custom data block
     '''
-    print("Found block {}".format(filename))
+    print(f"Found block {filename} at offset {hex(f.tell())}")
 
     buffer = b''
     header = bytes((0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74))
@@ -148,7 +160,7 @@ def read_block(f, filename):
 
     while not header_detected:
         v = f.read(1)
-        #print(f"read_block: {hex(int.from_bytes(v,))}")
+        #print(f"read_block: {v}, offset {hex(f.tell())}")
         
         if v == b'':
             break  # EOF
@@ -163,6 +175,8 @@ def read_block(f, filename):
             f.seek(f.tell() - 8)
         else:
             out.write(buffer)
+    
+    #print(f"Block {filename} read, f.tell() = {hex(f.tell())}\n\n")
 
 def read_basic(f):
     '''
