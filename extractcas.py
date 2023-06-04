@@ -35,6 +35,7 @@ def identify(f):
         return "EOF"
 
     value = f.read(1)
+    print(f"identify A: {value}")
     
     if value == b'':
         return "EOF"
@@ -48,7 +49,9 @@ def identify(f):
                 return "EOF"
         return d[value]
     
-    # Data block
+    # It's a data block. We have to undue the read of the
+    # identification, since a custom block doesn't have one.
+    f.seek(f.tell() - 1)
     return "BLOCK"
     
 
@@ -143,13 +146,15 @@ def read_block(f, filename):
     header_detected = buffer[-7:] == header
     EOF = False
 
-    while not header_detected and not EOF:
+    while not header_detected:
         v = f.read(1)
+        #print(f"read_block: {hex(int.from_bytes(v,))}")
+        
         if v == b'':
-            EOF = True
-        else:
-            buffer += v
-            header_detected = buffer[-7:] == header
+            break  # EOF
+
+        buffer += v
+        header_detected = buffer[-7:] == header
 
     with open(filename, 'wb') as out:
         if header_detected:
